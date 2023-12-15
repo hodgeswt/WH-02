@@ -16,18 +16,21 @@ fn main() {
     };
 
     let mut parser = Parser::new(lexer);
-
-    while parser.has_next {
+    let mut found_error = false;
+    while parser.has_next && !found_error {
         let result = parser.parse();
 
         match result {
             Err(error) => {
                 println!("ERROR: {}", error);
+                found_error = true;
             },
             Ok(_) => { }
         }
     }
 
-    println!("{:#?}", parser.expressions);
+    if !found_error {
+        println!("{:#?}", parser.expressions);
+    }
 
 }

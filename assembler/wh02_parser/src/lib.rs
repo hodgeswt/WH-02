@@ -142,7 +142,7 @@ impl<'a> Parser<'a> {
             Err(error) => {
                 return Err(ParserError {
                     position: error.position,
-                    message: format!("Lexical error: {}", error.message),
+                    message: format!("\n\t==> Lexical error: {}", error.message),
                 });
             }
         }

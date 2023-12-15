@@ -35,9 +35,10 @@ impl Expressions {
 
     pub fn validate_unary_keyword(keyword: Keyword) -> Result<(), ParserError> {
         match keyword {
+            Keyword::DEF => Ok(()),
             _ => Err(ParserError {
                 position: Default::default(),
-                message: format!("\n\t==> Invalid keyword: {}. Unary operations not yet implemented.", keyword),
+                message: format!("\n\t==> Invalid keyword: {}. Expected one of {:#?}", keyword, vec![Keyword::DEF]),
             }),
         }
     }

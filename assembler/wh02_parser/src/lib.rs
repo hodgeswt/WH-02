@@ -92,6 +92,7 @@ impl<'a> Parser<'a> {
                         TokenType::Hex,
                         TokenType::Address,
                         TokenType::Location,
+                        TokenType::Word,
                     ],
                     vec![TokenType::Newline],
                 ];

@@ -195,7 +195,11 @@ impl<'a> Lexer<'a> {
 
         match c {
             Some(c) => {
-                if c == ',' {
+                if c == '.' {
+                    token_type = TokenType::Word;
+                    val.push(c);
+                    self.parse_alnum(&mut val);
+                } else if c == ',' {
                     token_type = TokenType::Comma;
                     val.push(c);
                 } else if c == ';' {

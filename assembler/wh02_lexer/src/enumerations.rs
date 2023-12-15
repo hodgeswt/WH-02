@@ -11,6 +11,7 @@ pub enum TokenType {
     Whitespace,
     Newline,
     EndOfFile,
+    Word,
     Unknown,
 }
 
@@ -26,6 +27,7 @@ impl fmt::Display for TokenType {
             TokenType::Whitespace => "Whitespace",
             TokenType::Newline => "Newline",
             TokenType::EndOfFile => "EndOfFile",
+            TokenType::Word => "Word",
             TokenType::Unknown => "Unknown",
         })
     }

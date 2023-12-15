@@ -3,4 +3,5 @@
 members = [
     "wh02_lexer",
     "wh02",
+    "wh02_parser",
 ]

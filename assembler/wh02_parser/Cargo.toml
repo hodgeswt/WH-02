@@ -1,5 +1,5 @@
 [package]
-name = "wh02"
+name = "wh02_parser"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,4 +7,3 @@ edition = "2021"
 
 [dependencies]
 wh02_lexer = { path = "../wh02_lexer" }
-wh02_parser = { path = "../wh02_parser" }

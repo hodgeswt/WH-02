@@ -4,10 +4,10 @@ use std::str::Chars;
 pub mod position;
 pub mod token;
 pub mod enumerations;
-pub mod error;
+pub mod lexer_error;
 
 use enumerations::TokenType;
-use error::Error;
+use lexer_error::LexerError;
 use position::Position;
 use token::Token;
 
@@ -19,6 +19,7 @@ fn is_special(c: char) -> bool {
     return c == '#' || c == '$' || c == '@' || c == ',' || c == ';' || c.is_ascii_whitespace();
 }
 
+#[derive(Debug, Clone)]
 pub struct Lexer<'a> {
     pub position: Position,
     pub characters: Peekable<Chars<'a>>,
@@ -42,7 +43,7 @@ impl<'a> Lexer<'a> {
         return c;
     }
 
-    fn parse_hex(&mut self, val: &mut String) -> Result<(), Error>{
+    fn parse_hex(&mut self, val: &mut String) -> Result<(), LexerError>{
         let mut end = false;
         while !end {
             let next = self.characters.peek();
@@ -61,7 +62,7 @@ impl<'a> Lexer<'a> {
             match c {
                 Some(c) => {
                     if !c.is_ascii_hexdigit() {
-                        return Err(Error {
+                        return Err(LexerError {
                             message: format!("Invalid hex digit: {}", c),
                             position: self.position,
                         });
@@ -185,10 +186,12 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn lex(&mut self) -> Result<Token, Error> {
+    pub fn lex(&mut self) -> Result<Token, LexerError> {
         let mut val = String::new();
         let token_type;
         let c = self.next_char();
+
+        let start_position = self.position.clone();
 
         match c {
             Some(c) => {
@@ -224,7 +227,7 @@ impl<'a> Lexer<'a> {
                     val.push(c);
                     self.parse_whitespace(&mut val);
                 } else {
-                    return Err(Error {
+                    return Err(LexerError {
                         message: format!("Unknown character: {}", c),
                         position: self.position,
                     });
@@ -235,6 +238,6 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        return Ok(Token::new(val, token_type));
+        return Ok(Token::new(val, token_type, start_position));
     }
 }

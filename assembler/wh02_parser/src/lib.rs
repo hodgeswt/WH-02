@@ -42,6 +42,113 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
+    fn parse_no_operand(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+        let token_types = vec![
+            vec![TokenType::Operation],
+            vec![TokenType::Newline],
+        ];
+        self.match_token_types(&toks, token_types)?;
+
+        let result = Expressions::validate_no_operand_keyword(
+            Keyword::from_str(&toks[0].value, toks[0].start_position)?
+        );
+
+        match result {
+            Ok(_) => {},
+            Err(mut error) => {
+                error.position = toks[0].start_position;
+                return Err(error);
+            }
+        }
+
+        let keyword = toks[0].value.to_string();
+        self.expressions.push(Expressions::NoOperandExpression {
+            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+        });
+
+        Ok(())
+    }
+
+    fn parse_unary(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+        let token_types = vec![
+            vec![TokenType::Operation],
+            vec![
+                TokenType::Hex,
+                TokenType::Address,
+                TokenType::Location,
+                TokenType::Word,
+            ],
+            vec![TokenType::Newline],
+        ];
+        self.match_token_types(&toks, token_types)?;
+
+        let result = Expressions::validate_unary_keyword(
+            Keyword::from_str(&toks[0].value, toks[0].start_position)?
+        );
+
+        match result {
+            Ok(_) => {},
+            Err(mut error) => {
+                error.position = toks[0].start_position;
+                return Err(error);
+            }
+        }
+
+        let keyword = toks[0].value.to_string();
+        let operand = toks[1].value.to_string();
+
+        self.expressions.push(Expressions::UnaryExpression {
+            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+            operand: Operand::from_str(&operand, toks[1].start_position)?,
+        });
+
+        Ok(())
+    }
+
+    fn parse_binary(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+        let token_types = vec![
+            vec![TokenType::Operation],
+            vec![
+                TokenType::Hex,
+                TokenType::Address,
+                TokenType::Location,
+            ],
+            vec![TokenType::Comma],
+            vec![
+                TokenType::Hex,
+                TokenType::Address,
+                TokenType::Location,
+            ],
+            vec![TokenType::Newline],
+        ];
+        self.match_token_types(&toks, token_types)?;
+
+        let result = Expressions::validate_binary_keyword(
+            Keyword::from_str(&toks[0].value, toks[0].start_position)?
+        );
+
+        match result {
+            Ok(_) => {},
+            Err(mut error) => {
+                error.position = toks[0].start_position;
+                return Err(error);
+            }
+        }
+
+        let keyword = toks[0].value.to_string();
+        let operand1 = toks[1].value.to_string();
+        let operand2 = toks[3].value.to_string();
+
+        self.expressions.push(Expressions::BinaryExpression {
+            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+            operand1: Operand::from_str(&operand1, toks[1].start_position)?,
+            comma: toks[2].value.to_string(),
+            operand2: Operand::from_str(&operand2, toks[3].start_position)?,
+        });
+
+        Ok(())
+    }
+
     fn parse_line(&mut self, line: Vec<Token>) -> Result<(), ParserError> {
         let plain_tokens: Vec<Token> = line.clone();
         let toks: Vec<Token> = plain_tokens
@@ -60,105 +167,19 @@ impl<'a> Parser<'a> {
                 // End of File
                 return Ok(())
             }
+            1 => {
+                self.parse_no_operand(toks)?;
+            }
             2 => {
-                let token_types = vec![
-                    vec![TokenType::Operation],
-                    vec![TokenType::Newline],
-                ];
-                self.match_token_types(&toks, token_types)?;
-
-                let result = Expressions::validate_no_operand_keyword(
-                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
-                );
-
-                match result {
-                    Ok(_) => {},
-                    Err(mut error) => {
-                        error.position = toks[0].start_position;
-                        return Err(error);
-                    }
-                }
-
-                let keyword = toks[0].value.to_string();
-                self.expressions.push(Expressions::NoOperandExpression {
-                    keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
-                });
+                self.parse_no_operand(toks)?;
             },
 
             3 => {
-                let token_types = vec![
-                    vec![TokenType::Operation],
-                    vec![
-                        TokenType::Hex,
-                        TokenType::Address,
-                        TokenType::Location,
-                        TokenType::Word,
-                    ],
-                    vec![TokenType::Newline],
-                ];
-                self.match_token_types(&toks, token_types)?;
-
-                let result = Expressions::validate_unary_keyword(
-                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
-                );
-
-                match result {
-                    Ok(_) => {},
-                    Err(mut error) => {
-                        error.position = toks[0].start_position;
-                        return Err(error);
-                    }
-                }
-
-                let keyword = toks[0].value.to_string();
-                let operand = toks[1].value.to_string();
-
-                self.expressions.push(Expressions::UnaryExpression {
-                    keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
-                    operand: Operand::from_str(&operand, toks[1].start_position)?,
-                });
+                self.parse_unary(toks)?;
             },
 
             5 => {
-                let token_types = vec![
-                    vec![TokenType::Operation],
-                    vec![
-                        TokenType::Hex,
-                        TokenType::Address,
-                        TokenType::Location,
-                    ],
-                    vec![TokenType::Comma],
-                    vec![
-                        TokenType::Hex,
-                        TokenType::Address,
-                        TokenType::Location,
-                    ],
-                    vec![TokenType::Newline],
-                ];
-                self.match_token_types(&toks, token_types)?;
-
-                let result = Expressions::validate_binary_keyword(
-                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
-                );
-
-                match result {
-                    Ok(_) => {},
-                    Err(mut error) => {
-                        error.position = toks[0].start_position;
-                        return Err(error);
-                    }
-                }
-
-                let keyword = toks[0].value.to_string();
-                let operand1 = toks[1].value.to_string();
-                let operand2 = toks[3].value.to_string();
-
-                self.expressions.push(Expressions::BinaryExpression {
-                    keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
-                    operand1: Operand::from_str(&operand1, toks[1].start_position)?,
-                    comma: toks[2].value.to_string(),
-                    operand2: Operand::from_str(&operand2, toks[3].start_position)?,
-                });
+                self.parse_binary(toks)?;
             },
             _ => {
                 return Err(ParserError {

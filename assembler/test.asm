@@ -1,5 +1,4 @@
-MOV @A,@B
-MOV #fa,@B ; testing a comment
-DEF .start
+MOV #01,@A
+MOV #01,@B
+MOV @ACC,@O1
 HLT
-;;;;;

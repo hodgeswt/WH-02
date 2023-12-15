@@ -1,2 +1,3 @@
 MOV @A,@B
-MOV #far,@B
+MOV #fa,@B ; testing a comment
+;;;;;

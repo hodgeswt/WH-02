@@ -83,7 +83,7 @@ impl<'a> Lexer<'a> {
             let next = self.characters.peek();
             match next {
                 Some(next) => {
-                    if (*next) != '\n' {
+                    if is_newline(*next) {
                         break;
                     }
                 },
@@ -196,7 +196,7 @@ impl<'a> Lexer<'a> {
                     token_type = TokenType::Comma;
                     val.push(c);
                 } else if c == ';' {
-                    token_type = TokenType::CommentStart;
+                    token_type = TokenType::Comment;
                     val.push(c);
                     self.parse_comment(&mut val);
                 } else if c == '#' {

@@ -19,7 +19,7 @@ fn main() {
     while more {
         match token {
             Ok(ref t) => {
-                println!("Token: {} Type: {}", t.value, t.token_type);
+                println!("Token: '{}' Type: {}", t.value, t.token_type);
                 if t.token_type == TokenType::EndOfFile {
                     more = false;
                 } else {

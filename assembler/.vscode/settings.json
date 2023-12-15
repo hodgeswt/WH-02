@@ -1,0 +1,9 @@
+{
+    "rust-analyzer.linkedProjects": [
+        ".\\lexer\\Cargo.toml",
+        ".\\Cargo.toml",
+        ".\\wh02\\Cargo.toml",
+        ".\\wh02_lexer\\Cargo.toml"
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
+}

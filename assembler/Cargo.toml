@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "wh02_lexer",
+    "wh02",
+]

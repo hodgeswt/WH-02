@@ -14,22 +14,26 @@ use token::Token;
 fn is_newline(c: char) -> bool {
     return c == '\n' || c == '\r';
 }
+
+fn is_special(c: char) -> bool {
+    return c == '#' || c == '$' || c == '@' || c == ',' || c == ';' || c.is_ascii_whitespace();
+}
+
 pub struct Lexer<'a> {
     pub position: Position,
     pub characters: Peekable<Chars<'a>>,
 }
 
 impl<'a> Lexer<'a> {
+
     fn next_char(&mut self) -> Option<char> {
         let c = self.characters.next();
-
+        self.position.col += 1;
         match c {
             Some(c) => {
                 if is_newline(c) {
                     self.position.line += 1;
                     self.position.col = 0;
-                } else {
-                    self.position.col += 1;
                 }
             }
             _ => {}
@@ -38,13 +42,13 @@ impl<'a> Lexer<'a> {
         return c;
     }
 
-    fn parse_hex(&mut self, val: &mut String) {
+    fn parse_hex(&mut self, val: &mut String) -> Result<(), Error>{
         let mut end = false;
         while !end {
             let next = self.characters.peek();
             match next {
                 Some(next) => {
-                    if !(*next).is_ascii_hexdigit() {
+                    if is_special(*next) {
                         break;
                     }
                 },
@@ -53,9 +57,15 @@ impl<'a> Lexer<'a> {
                 }
             }
 
-            let c = self.characters.next();
+            let c = self.next_char();
             match c {
                 Some(c) => {
+                    if !c.is_ascii_hexdigit() {
+                        return Err(Error {
+                            message: format!("Invalid hex digit: {}", c),
+                            position: self.position,
+                        });
+                    }
                     val.push(c);
                 },
                 None => {
@@ -63,6 +73,8 @@ impl<'a> Lexer<'a> {
                 }
             }
         }
+
+        Ok(())
     }
 
     fn parse_comment(&mut self, val: &mut String) {
@@ -80,7 +92,7 @@ impl<'a> Lexer<'a> {
                 }
             }
 
-            let c = self.characters.next();
+            let c = self.next_char();
             match c {
                 Some(c) => {
                     val.push(c);
@@ -107,7 +119,7 @@ impl<'a> Lexer<'a> {
                 }
             }
 
-            let c = self.characters.next();
+            let c = self.next_char();
             match c {
                 Some(c) => {
                     val.push(c);
@@ -134,7 +146,7 @@ impl<'a> Lexer<'a> {
                 }
             }
 
-            let c = self.characters.next();
+            let c = self.next_char();
             match c {
                 Some(c) => {
                     val.push(c);
@@ -161,7 +173,7 @@ impl<'a> Lexer<'a> {
                 }
             }
 
-            let c = self.characters.next();
+            let c = self.next_char();
             match c {
                 Some(c) => {
                     val.push(c);
@@ -190,11 +202,11 @@ impl<'a> Lexer<'a> {
                 } else if c == '#' {
                     token_type = TokenType::Hex;
                     val.push(c);
-                    self.parse_hex(&mut val);
+                    self.parse_hex(&mut val)?;
                 } else if c == '$' {
                     token_type = TokenType::Address;
                     val.push(c);
-                    self.parse_hex(&mut val);
+                    self.parse_hex(&mut val)?;
                 } else if c == '@' {
                     token_type = TokenType::Location;
                     val.push(c);

@@ -27,7 +27,8 @@ fn main() {
                 }
             },
             Err(ref e) => {
-                println!("{}", e.message);
+                println!("Token error at {}: {}", e.position, e.message);
+                more = false;
             }
         }
     }

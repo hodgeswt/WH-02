@@ -1,2 +1,2 @@
 MOV @A,@B
-MOV #fa,@B
+MOV #far,@B

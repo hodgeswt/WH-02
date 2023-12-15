@@ -57,6 +57,7 @@ impl<'a> Parser<'a> {
 
         match toks.len() {
             0 => {
+                // End of File
                 return Ok(())
             }
             2 => {
@@ -65,6 +66,18 @@ impl<'a> Parser<'a> {
                     vec![TokenType::Newline],
                 ];
                 self.match_token_types(&toks, token_types)?;
+
+                let result = Expressions::validate_no_operand_keyword(
+                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
+                );
+
+                match result {
+                    Ok(_) => {},
+                    Err(mut error) => {
+                        error.position = toks[0].start_position;
+                        return Err(error);
+                    }
+                }
 
                 let keyword = toks[0].value.to_string();
                 self.expressions.push(Expressions::NoOperandExpression {
@@ -83,6 +96,18 @@ impl<'a> Parser<'a> {
                     vec![TokenType::Newline],
                 ];
                 self.match_token_types(&toks, token_types)?;
+
+                let result = Expressions::validate_unary_keyword(
+                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
+                );
+
+                match result {
+                    Ok(_) => {},
+                    Err(mut error) => {
+                        error.position = toks[0].start_position;
+                        return Err(error);
+                    }
+                }
 
                 let keyword = toks[0].value.to_string();
                 let operand = toks[1].value.to_string();
@@ -110,6 +135,18 @@ impl<'a> Parser<'a> {
                     vec![TokenType::Newline],
                 ];
                 self.match_token_types(&toks, token_types)?;
+
+                let result = Expressions::validate_binary_keyword(
+                    Keyword::from_str(&toks[0].value, toks[0].start_position)?
+                );
+
+                match result {
+                    Ok(_) => {},
+                    Err(mut error) => {
+                        error.position = toks[0].start_position;
+                        return Err(error);
+                    }
+                }
 
                 let keyword = toks[0].value.to_string();
                 let operand1 = toks[1].value.to_string();

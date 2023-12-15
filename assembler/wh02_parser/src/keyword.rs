@@ -7,6 +7,7 @@ use crate::parser_error::ParserError;
 pub enum Keyword {
     MOV,
     HLT,
+    NOP,
 }
 
 impl Keyword {
@@ -14,6 +15,7 @@ impl Keyword {
         match keyword {
             "MOV" => Ok(Keyword::MOV),
             "HLT" => Ok(Keyword::HLT),
+            "NOP" => Ok(Keyword::NOP),
             _ => Err(ParserError {
                 position,
                 message: format!("Invalid keyword: {}", keyword),
@@ -27,6 +29,7 @@ impl fmt::Display for Keyword {
         match *self {
             Keyword::MOV => write!(f, "MOV"),
             Keyword::HLT => write!(f, "HLT"),
+            Keyword::NOP => write!(f, "NOP"),
         }
     }
 }

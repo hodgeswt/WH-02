@@ -5,6 +5,9 @@ use wh02_lexer::position::Position;
 
 use wh02_parser::Parser;
 
+pub mod assembler;
+pub mod assembler_error;
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -29,8 +32,14 @@ fn main() {
         }
     }
 
-    if !found_error {
-        println!("{:#?}", parser.expressions);
+    let mut output = String::new();
+
+    for expression in parser.expressions {
+        output.push_str(&format!("{:?}\n", expression));
     }
+
+    let mut start_index: u32 = 0;
+
+    println!("{}", output);
 
 }

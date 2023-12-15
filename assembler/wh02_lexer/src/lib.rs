@@ -16,7 +16,14 @@ fn is_newline(c: char) -> bool {
 }
 
 fn is_special(c: char) -> bool {
-    return c == '#' || c == '$' || c == '@' || c == ',' || c == ';' || c.is_ascii_whitespace();
+    return
+        c == '#'
+        || c == '$'
+        || c == '@'
+        || c == ','
+        || c == ';'
+        || c == '.'
+        || c.is_ascii_whitespace();
 }
 
 #[derive(Debug, Clone)]

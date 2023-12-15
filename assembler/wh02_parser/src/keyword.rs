@@ -9,6 +9,7 @@ pub enum Keyword {
     HLT,
     NOP,
     DEF,
+    START,
 }
 
 impl Keyword {
@@ -18,6 +19,7 @@ impl Keyword {
             "HLT" => Ok(Keyword::HLT),
             "NOP" => Ok(Keyword::NOP),
             "DEF" => Ok(Keyword::DEF),
+            "START" => Ok(Keyword::START),
             _ => Err(ParserError {
                 position,
                 message: format!("Invalid keyword: {}", keyword),
@@ -33,6 +35,7 @@ impl fmt::Display for Keyword {
             Keyword::HLT => write!(f, "HLT"),
             Keyword::NOP => write!(f, "NOP"),
             Keyword::DEF => write!(f, "DEF"),
+            Keyword::START => write!(f, "START"),
         }
     }
 }

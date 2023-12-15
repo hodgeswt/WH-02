@@ -1,3 +1,4 @@
+START $00
 MOV #01,@A
 MOV #01,@B
 MOV @ACC,@O1

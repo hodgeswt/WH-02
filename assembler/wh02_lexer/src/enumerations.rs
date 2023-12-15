@@ -13,6 +13,7 @@ pub enum TokenType {
     EndOfFile,
     Word,
     Unknown,
+    StartPosition,
 }
 
 impl fmt::Display for TokenType {
@@ -29,6 +30,7 @@ impl fmt::Display for TokenType {
             TokenType::EndOfFile => "EndOfFile",
             TokenType::Word => "Word",
             TokenType::Unknown => "Unknown",
+            TokenType::StartPosition => "StartPosition",
         })
     }
 }
@@ -36,4 +38,5 @@ impl fmt::Display for TokenType {
 pub enum Keywords {
     MOV,
     HLT,
+    NOP,
 }

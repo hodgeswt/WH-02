@@ -105,6 +105,13 @@ MOV_BUS_C = 0x23
 MOV_BUS_O1 = 0x24
 MOV_BUS_O2 = 0x25
 MOV_BUS_RAM = 0x26
+# Moving from accumulator to destination
+MOV_ACC_A = 0x27
+MOV_ACC_B = 0x28
+MOV_ACC_C = 0x29
+MOV_ACC_O1 = 0x2A
+MOV_ACC_O2 = 0x2B
+MOV_ACC_RAM = 0x2C
 
 ##
 ## Assign microcode
@@ -221,30 +228,54 @@ code[7][MOV_RAM_RAM] = rw_bits('STK','RAM')
 code[2][HLT] = 0x10000
 
 # MOV_BUS_A
-code[2][MOV_BUS_A] = ENABLE_PRGC
+code[2][MOV_BUS_A] = rw_bits('PRGC','MAR')
 code[3][MOV_BUS_A] = rw_bits('RAM','A')
 code[4][MOV_BUS_A] = RESET_STEPC
 
 # MOV_BUS_B
-code[2][MOV_BUS_B] = ENABLE_PRGC
+code[2][MOV_BUS_A] = rw_bits('PRGC','MAR')
 code[3][MOV_BUS_B] = rw_bits('RAM','B')
 code[4][MOV_BUS_B] = RESET_STEPC
 
 # MOV_BUS_C
-code[2][MOV_BUS_C] = ENABLE_PRGC
+code[2][MOV_BUS_A] = rw_bits('PRGC','MAR')
 code[3][MOV_BUS_C] = rw_bits('RAM','C')
 code[4][MOV_BUS_C] = RESET_STEPC
 
 # MOV_BUS_O1
-code[2][MOV_BUS_O1] = ENABLE_PRGC
+code[2][MOV_BUS_A] = rw_bits('PRGC','MAR')
 code[3][MOV_BUS_O1] = rw_bits('RAM','O1')
 code[4][MOV_BUS_O1] = RESET_STEPC
 
 # MOV_BUS_O2
-code[2][MOV_BUS_O2] = ENABLE_PRGC
+code[2][MOV_BUS_A] = rw_bits('PRGC','MAR')
 code[3][MOV_BUS_O2] = rw_bits('RAM','O2')
 code[4][MOV_BUS_O2] = RESET_STEPC
 
+# MOV_ACC_A
+code[2][MOV_ACC_A] = rw_bits('ACC','A')
+code[3][MOV_ACC_A] = RESET_STEPC
+
+# MOV_ACC_B
+code[2][MOV_ACC_B] = rw_bits('ACC','B')
+code[3][MOV_ACC_B] = RESET_STEPC
+
+# MOV_ACC_C
+code[2][MOV_ACC_C] = rw_bits('ACC','C')
+code[3][MOV_ACC_C] = RESET_STEPC
+
+# MOV_ACC_O1
+code[2][MOV_ACC_O1] = rw_bits('ACC','O1')
+code[3][MOV_ACC_O1] = RESET_STEPC
+
+# MOV_ACC_O2
+code[2][MOV_ACC_O2] = rw_bits('ACC','O2')
+code[3][MOV_ACC_O2] = RESET_STEPC
+
+# MOV_ACC_RAM
+code[2][MOV_ACC_RAM] = rw_bits('INST','MAR')
+code[3][MOV_ACC_RAM] = rw_bits('ACC','RAM')
+code[4][MOV_ACC_RAM] = RESET_STEPC
 
 def to_rom_index(i, j):
     return f"{bin(i)[2:].rjust(3,'0')}{bin(j)[2:].rjust(8,'0')}"

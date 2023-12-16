@@ -12,6 +12,7 @@ pub struct Assembler {
     size: usize,
     pub words: HashMap<String, usize>,
     index: usize,
+    pub assembled: Vec<String>,
 }
 
 impl Assembler {
@@ -23,11 +24,12 @@ impl Assembler {
             size: 256,
             words: HashMap::new(),
             index: 0,
+            assembled: Vec::new(),
         }
     }
 
-    pub fn assemble(&mut self) -> Result<Vec<String>, AssemblerError> {
-        let mut assembled: Vec<String> = vec!["00".to_string(); self.size];
+    pub fn assemble(&mut self) -> Result<String, AssemblerError> {
+        self.assembled = vec!["00".to_string(); self.size];
         self.index = self.start_index;
 
         for expr in self.expressions.clone() {
@@ -36,13 +38,27 @@ impl Assembler {
             if result != "" {
                 let splits = result.split(' ').collect::<Vec<&str>>();
                 for entry in splits {
-                    assembled[self.index] = entry.to_string();
+                    self.assembled[self.index] = entry.to_string();
                     self.index += 1;
                 }
             }
         }
 
-        Ok(assembled)
+        let mut output = String::new();
+        output += "v3.0 hex words addressed\n00: ";
+        let mut counter = 0;
+        let mut address = 0;
+        let len = self.assembled.len();
+        for byte in self.assembled.clone() {
+            output += format!("{} ", byte).as_str();
+            counter += 1;
+            address += 1;
+            if counter % 16 == 0 && address < len {
+                output += format!("\n{:02x}: ", address).as_str();
+            }
+        }
+
+        Ok(output)
     }
 
     pub fn assemble_expression(&mut self, expr: Expressions) -> Result<String, AssemblerError> {

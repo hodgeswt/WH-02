@@ -90,6 +90,9 @@ impl<'a> Lexer<'a> {
             }
         }
 
+        // Normalize hex values to uppercase
+        *val = val.to_ascii_uppercase();
+
         Ok(())
     }
 

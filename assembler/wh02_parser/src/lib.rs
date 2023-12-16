@@ -171,7 +171,7 @@ impl<'a> Parser<'a> {
         let operand1 = toks[1].value.to_string();
         let operand2 = toks[3].value.to_string();
 
-        self.validate_second_operand(&keyword, &operand2);
+        self.validate_second_operand(&keyword, &operand1, &operand2);
 
         self.expressions.push(Expressions::BinaryExpression {
             keyword,
@@ -183,7 +183,7 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
-    fn validate_second_operand(&mut self, keyword: &Keyword, operand: &String) {
+    fn validate_second_operand(&mut self, keyword: &Keyword, operand1: &String, operand2: &String) {
         if keyword == &Keyword::MOV {
             let valid_destinations = vec![
                 "@A",
@@ -193,9 +193,16 @@ impl<'a> Parser<'a> {
                 "@O2",
             ];
 
-            if !valid_destinations.contains(&operand.as_str()) {
+            let is_addr = operand2.starts_with('$');
+
+            if !is_addr && !valid_destinations.contains(&operand2.as_str()) {
                 self.errors.push(ParserError {
-                    message: format!("Invalid destination provided: {}. Expected one of {:#?}", operand, valid_destinations),
+                    message: format!("Invalid destination provided: {}. Expected one of {:#?}", operand2, valid_destinations),
+                    position: self.lexer.position,
+                });
+            } else if !is_addr && operand1 == operand2 {
+                self.errors.push(ParserError {
+                    message: format!("Invalid destination provided: {}. Destination cannot be the same as the source", operand1),
                     position: self.lexer.position,
                 });
             }

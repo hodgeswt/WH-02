@@ -37,6 +37,7 @@ impl Expressions {
         match keyword {
             Keyword::DEF => Ok(()),
             Keyword::START => Ok(()),
+            Keyword::JMP => Ok(()),
             _ => Err(ParserError {
                 position: Default::default(),
                 message: format!("\n\t==> Invalid keyword: {}. Expected one of {:#?}", keyword, vec![Keyword::DEF, Keyword::START]),

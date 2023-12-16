@@ -79,6 +79,7 @@ impl<'a> Parser<'a> {
         let keyword_operands: HashMap<Keyword, Vec<TokenType>> = HashMap::from([
             (Keyword::DEF, vec![TokenType::Word]),
             (Keyword::START, vec![TokenType::Address]),
+            (Keyword::JMP, vec![TokenType::Address, TokenType::Word]),
         ]);
 
         let token_types = vec![
@@ -133,6 +134,7 @@ impl<'a> Parser<'a> {
                 TokenType::Hex,
                 TokenType::Address,
                 TokenType::Location,
+                TokenType::Word,
             ],
             vec![TokenType::Newline],
         ];

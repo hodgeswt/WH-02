@@ -30,7 +30,28 @@ fn main() {
         }
     }
 
-    for error in parser.errors {
-        println!("ERROR: {}", error);
+    if parser.errors.len() > 0 {
+        for error in parser.errors {
+            println!("ERROR: {}", error);
+        }
+
+        return;
     }
+
+    let mut assembler = assembler::Assembler::new(parser.expressions);
+
+    let success = assembler.assemble();
+
+    match success {
+        Err(error) => {
+            println!("ERROR: {}", error);
+            return;
+        },
+        Ok(success) => {
+            println!("{:?}", success);
+        }
+
+    }
+
+
 }

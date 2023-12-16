@@ -33,41 +33,61 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn validate_token_types(&mut self, tokens: &Vec<Token>, types: Vec<Vec<TokenType>>) -> Result<(), ParserError> {
+    pub fn parse_all(&mut self) {
+        while self.has_next {
+            let res = self.parse();
+            match res {
+                Ok(_) => {},
+                Err(error) => {
+                    self.errors.push(error);
+                    break;
+                }
+            }
+        }
+
+
+        if self.errors.len() > 0 {
+            for error in &self.errors {
+                println!("ERROR: {}", error);
+            }
+        }
+    }
+
+    fn validate_token_types(&mut self, tokens: &Vec<Token>, types: Vec<Vec<TokenType>>) {
         for i in 0..tokens.len() {
             if !types[i].contains(&tokens[i].token_type) {
-                return Err(ParserError {
+                self.errors.push(ParserError {
                     message: format!("Invalid token type {}, expected one of {:#?}", tokens[i].token_type, types[i]),
                     position: tokens[i].start_position,
                 })
             }
         }
-
-        Ok(())
     }
 
     fn parse_no_operand(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+
+        let keyword = Keyword::from_str(&toks[0].value, toks[0].start_position)?;
+
         let token_types = vec![
             vec![TokenType::Operation],
             vec![TokenType::Newline],
         ];
-        self.validate_token_types(&toks, token_types)?;
+        self.validate_token_types(&toks, token_types);
 
         let result = Expressions::validate_no_operand_keyword(
-            Keyword::from_str(&toks[0].value, toks[0].start_position)?
+            keyword.clone()
         );
 
         match result {
             Ok(_) => {},
             Err(mut error) => {
                 error.position = toks[0].start_position;
-                return Err(error);
+                self.errors.push(error);
             }
         }
 
-        let keyword = toks[0].value.to_string();
         self.expressions.push(Expressions::NoOperandExpression {
-            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+            keyword,
         });
 
         Ok(())
@@ -88,12 +108,12 @@ impl<'a> Parser<'a> {
             vec![TokenType::Newline],
         ];
 
-        self.validate_token_types(&toks, token_types)?;
+        self.validate_token_types(&toks, token_types);
 
         let result = Expressions::validate_unary_keyword(keyword.clone());
 
         if keyword == Keyword::START && self.expressions.len() > 0 {
-            return Err(ParserError {
+            self.errors.push(ParserError {
                 message: "START instruction must occur first.".to_string(),
                 position: toks[0].start_position,
             })
@@ -105,14 +125,14 @@ impl<'a> Parser<'a> {
             Ok(_) => {},
             Err(mut error) => {
                 error.position = toks[0].start_position;
-                return Err(error);
+                self.errors.push(error);
             }
         }
 
         let operand = toks[1].value.to_string();
 
         self.expressions.push(Expressions::UnaryExpression {
-            keyword: keyword.clone(),
+            keyword,
             operand: Operand::from_str(&operand, toks[1].start_position)?,
         });
 
@@ -123,47 +143,63 @@ impl<'a> Parser<'a> {
         let keyword = Keyword::from_str(&toks[0].value, toks[0].start_position)?;
 
         let keyword_operands: HashMap<Keyword, Vec<TokenType>> = HashMap::from([
-            (Keyword::MOV, vec![TokenType::Hex, TokenType::Address, TokenType::Location]),
+            (Keyword::MOV, vec![TokenType::Hex, TokenType::Address, TokenType::Location, TokenType::Word]),
         ]);
 
         let token_types = vec![
             vec![TokenType::Operation],
             keyword_operands[&keyword].clone(),
             vec![TokenType::Comma],
-            vec![
-                TokenType::Hex,
-                TokenType::Address,
-                TokenType::Location,
-                TokenType::Word,
-            ],
+            keyword_operands[&keyword].clone(),
             vec![TokenType::Newline],
         ];
-        self.validate_token_types(&toks, token_types)?;
+
+        self.validate_token_types(&toks, token_types);
 
         let result = Expressions::validate_binary_keyword(
-            Keyword::from_str(&toks[0].value, toks[0].start_position)?
+            keyword.clone()
         );
 
         match result {
             Ok(_) => {},
             Err(mut error) => {
                 error.position = toks[0].start_position;
-                return Err(error);
+                self.errors.push(error);
             }
         }
 
-        let keyword = toks[0].value.to_string();
         let operand1 = toks[1].value.to_string();
         let operand2 = toks[3].value.to_string();
 
+        self.validate_second_operand(&keyword, &operand2);
+
         self.expressions.push(Expressions::BinaryExpression {
-            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+            keyword,
             operand1: Operand::from_str(&operand1, toks[1].start_position)?,
             comma: toks[2].value.to_string(),
             operand2: Operand::from_str(&operand2, toks[3].start_position)?,
         });
 
         Ok(())
+    }
+
+    fn validate_second_operand(&mut self, keyword: &Keyword, operand: &String) {
+        if keyword == &Keyword::MOV {
+            let valid_destinations = vec![
+                "@A",
+                "@B",
+                "@C",
+                "@O1",
+                "@O2",
+            ];
+
+            if !valid_destinations.contains(&operand.as_str()) {
+                self.errors.push(ParserError {
+                    message: format!("Invalid destination provided: {}. Expected one of {:#?}", operand, valid_destinations),
+                    position: self.lexer.position,
+                });
+            }
+        }
     }
 
     fn parse_line(&mut self, line: Vec<Token>) -> Result<(), ParserError> {

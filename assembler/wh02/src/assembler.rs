@@ -34,8 +34,11 @@ impl Assembler {
             let result = self.assemble_expression(expr.clone())?;
 
             if result != "" {
-                assembled[self.index] = result;
-                self.index += 1;
+                let splits = result.split(' ').collect::<Vec<&str>>();
+                for entry in splits {
+                    assembled[self.index] = entry.to_string();
+                    self.index += 1;
+                }
             }
         }
 
@@ -58,8 +61,20 @@ impl Assembler {
 
     fn assemble_binary_expression(&mut self, expr: Expressions) -> Result<String, AssemblerError> {
         match expr {
-            Expressions::BinaryExpression { .. } => {
-                Ok("".to_string())
+            Expressions::BinaryExpression { keyword, operand1, .. } => {
+                match keyword {
+                    Keyword::MOV => {
+                        let mut result = "".to_string();
+                        if operand1.indicator == '#' {
+                            result = "21".to_string();
+                            result += format!(" {}", operand1.value).as_str();
+                        }
+                        Ok(result)
+                    }
+                    _ => {
+                        Ok("".to_string())
+                    }
+                }
             },
             _ => {
                 Err(

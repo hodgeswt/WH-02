@@ -52,7 +52,14 @@ impl<'a> Lexer<'a> {
 
     fn parse_hex(&mut self, val: &mut String) -> Result<(), LexerError>{
         let mut end = false;
+        let mut len = 0;
         while !end {
+            if len > 2 {
+                return Err(LexerError {
+                    message: format!("Invalid hex value: {}. Expected two hexits.", val),
+                    position: self.position,
+                });
+            }
             let next = self.characters.peek();
             match next {
                 Some(next) => {
@@ -66,11 +73,12 @@ impl<'a> Lexer<'a> {
             }
 
             let c = self.next_char();
+            len += 1;
             match c {
                 Some(c) => {
                     if !c.is_ascii_hexdigit() {
                         return Err(LexerError {
-                            message: format!("Invalid hex digit: {}", c),
+                            message: format!("Invalid hexit: {}", c),
                             position: self.position,
                         });
                     }

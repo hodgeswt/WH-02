@@ -19,22 +19,10 @@ fn main() {
     };
 
     let mut parser = Parser::new(lexer);
-    while parser.has_next {
-        let result = parser.parse();
 
-        match result {
-            Err(error) => {
-                println!("ERROR: {}", error);
-            },
-            Ok(_) => { }
-        }
-    }
+    parser.parse_all();
 
     if parser.errors.len() > 0 {
-        for error in parser.errors {
-            println!("ERROR: {}", error);
-        }
-
         return;
     }
 
@@ -52,6 +40,4 @@ fn main() {
         }
 
     }
-
-
 }

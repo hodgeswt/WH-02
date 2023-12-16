@@ -3,7 +3,7 @@ use std::fmt;
 use wh02_lexer::position::Position;
 
 use crate::parser_error::ParserError;
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Keyword {
     MOV,
     HLT,

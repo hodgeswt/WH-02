@@ -31,15 +31,4 @@ fn main() {
             Ok(_) => { }
         }
     }
-
-    let mut output = String::new();
-
-    for expression in parser.expressions {
-        output.push_str(&format!("{:?}\n", expression));
-    }
-
-    let mut start_index: u32 = 0;
-
-    println!("{}", output);
-
 }

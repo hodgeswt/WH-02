@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use wh02_lexer::Lexer;
 use wh02_lexer::token::Token;
 use wh02_lexer::enumerations::TokenType;
@@ -29,7 +31,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn match_token_types(&mut self, tokens: &Vec<Token>, types: Vec<Vec<TokenType>>) -> Result<(), ParserError> {
+    fn validate_token_types(&mut self, tokens: &Vec<Token>, types: Vec<Vec<TokenType>>) -> Result<(), ParserError> {
         for i in 0..tokens.len() {
             if !types[i].contains(&tokens[i].token_type) {
                 return Err(ParserError {
@@ -47,7 +49,7 @@ impl<'a> Parser<'a> {
             vec![TokenType::Operation],
             vec![TokenType::Newline],
         ];
-        self.match_token_types(&toks, token_types)?;
+        self.validate_token_types(&toks, token_types)?;
 
         let result = Expressions::validate_no_operand_keyword(
             Keyword::from_str(&toks[0].value, toks[0].start_position)?
@@ -70,21 +72,31 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_unary(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+        let keyword = Keyword::from_str(&toks[0].value, toks[0].start_position)?;
+
+        let keyword_operands: HashMap<Keyword, Vec<TokenType>> = HashMap::from([
+            (Keyword::DEF, vec![TokenType::Word]),
+            (Keyword::START, vec![TokenType::Address]),
+        ]);
+
         let token_types = vec![
             vec![TokenType::Operation],
-            vec![
-                TokenType::Hex,
-                TokenType::Address,
-                TokenType::Location,
-                TokenType::Word,
-            ],
+            keyword_operands[&keyword].clone(),
             vec![TokenType::Newline],
         ];
-        self.match_token_types(&toks, token_types)?;
 
-        let result = Expressions::validate_unary_keyword(
-            Keyword::from_str(&toks[0].value, toks[0].start_position)?
-        );
+        self.validate_token_types(&toks, token_types)?;
+
+        let result = Expressions::validate_unary_keyword(keyword.clone());
+
+        if keyword == Keyword::START && self.expressions.len() > 0 {
+            return Err(ParserError {
+                message: "START instruction must occur first.".to_string(),
+                position: toks[0].start_position,
+            })
+        } else if keyword == Keyword::START {
+
+        }
 
         match result {
             Ok(_) => {},
@@ -94,11 +106,10 @@ impl<'a> Parser<'a> {
             }
         }
 
-        let keyword = toks[0].value.to_string();
         let operand = toks[1].value.to_string();
 
         self.expressions.push(Expressions::UnaryExpression {
-            keyword: Keyword::from_str(&keyword, toks[0].start_position)?,
+            keyword: keyword.clone(),
             operand: Operand::from_str(&operand, toks[1].start_position)?,
         });
 
@@ -106,13 +117,15 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_binary(&mut self, toks: Vec<Token>) -> Result<(), ParserError> {
+        let keyword = Keyword::from_str(&toks[0].value, toks[0].start_position)?;
+
+        let keyword_operands: HashMap<Keyword, Vec<TokenType>> = HashMap::from([
+            (Keyword::MOV, vec![TokenType::Hex, TokenType::Address, TokenType::Location]),
+        ]);
+
         let token_types = vec![
             vec![TokenType::Operation],
-            vec![
-                TokenType::Hex,
-                TokenType::Address,
-                TokenType::Location,
-            ],
+            keyword_operands[&keyword].clone(),
             vec![TokenType::Comma],
             vec![
                 TokenType::Hex,
@@ -121,7 +134,7 @@ impl<'a> Parser<'a> {
             ],
             vec![TokenType::Newline],
         ];
-        self.match_token_types(&toks, token_types)?;
+        self.validate_token_types(&toks, token_types)?;
 
         let result = Expressions::validate_binary_keyword(
             Keyword::from_str(&toks[0].value, toks[0].start_position)?

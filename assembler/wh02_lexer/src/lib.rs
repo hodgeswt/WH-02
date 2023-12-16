@@ -64,7 +64,7 @@ impl<'a> Lexer<'a> {
             match next {
                 Some(next) => {
                     if is_special(*next) {
-                        if len == 0 {
+                        if len != 2 {
                             return Err(LexerError {
                                 message: format!("Invalid hex value: {}. Expected two hexits.", val),
                                 position: self.position,

@@ -11,11 +11,11 @@ These operands are mapped in this table.
 
 | Location             | Name |
 | -------------------- | ---- |
-| A Register           | %A   |
-| B Register           | %B   |
-| C Register           | %C   |
-| Output Register 1    | %O1  |
-| Output Register 2    | %O2  |
+| A Register           | @A   |
+| B Register           | @B   |
+| C Register           | @C   |
+| Output Register 1    | @O1  |
+| Output Register 2    | @O2  |
 
 Registers can be both source and destination operands
 
@@ -38,9 +38,6 @@ A destination can either be a register or a RAM address.
     - If the destination is a register, source value is moved to that register
     - If the destination is a memory address, the source value is moved to that address
 
-## ADD
-ADD takes one argument, a destination. It takes the sum of the A and B register values and stores them in the destination.
-
 ## CMP
 CMP takes two arguments, both values to compare. If the argument is a register, the value in that register is used. If the argument is a memory address, the value at that address is used. If the argument is a value, that value is used.
 
@@ -54,3 +51,12 @@ BEQ takes one argument, a memory address. If the ALU flags are equal, the progra
 
 ## JMP
 JMP is an unconditional jump. It takes one argument, a memory address. The program counter is set to the value at that address. If the operand is a register, the program counter is set to the value in that register.
+
+## NOP
+No operation
+
+## HLT
+Halts the processor
+
+## START
+Takes an address as its operand, and defines where the program will be loaded into memory. This must be the first instruction in the program.

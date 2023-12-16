@@ -1,6 +1,5 @@
 START $00
-DEF .start
 MOV #01,@A
-MOV #,@B
-MOV @ACC,@O2
+MOV #01,@B
+MOV @ACC,@O1
 HLT

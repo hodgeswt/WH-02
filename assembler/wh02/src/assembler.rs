@@ -141,6 +141,7 @@ impl Assembler {
                                     }
                                 }
                             }
+                        result += format!(" {}", operand1.value).as_str();
                         } else {
                             match (operand1.value.as_str(), operand2.value.as_str()) {
                                 ("A", "B") => {

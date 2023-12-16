@@ -19,6 +19,7 @@ use crate::operand::Operand;
 pub struct Parser<'a> {
     pub lexer: Lexer<'a>,
     pub expressions: Vec<Expressions>,
+    pub errors: Vec<ParserError>,
     pub has_next: bool,
 }
 
@@ -27,6 +28,7 @@ impl<'a> Parser<'a> {
         Parser {
             lexer,
             expressions: Vec::new(),
+            errors: Vec::new(),
             has_next: true,
         }
     }
@@ -181,40 +183,47 @@ impl<'a> Parser<'a> {
                 return Ok(())
             }
             1 => {
-                self.parse_no_operand(toks)?;
+                let res = self.parse_no_operand(toks);
+                match res {
+                    Ok(_) => {},
+                    Err(error) => {
+                        self.errors.push(error);
+                    }
+                }
             }
             2 => {
-                self.parse_no_operand(toks)?;
+                let res = self.parse_no_operand(toks);
+                match res {
+                    Ok(_) => {},
+                    Err(error) => {
+                        self.errors.push(error);
+                    }
+                }
             },
 
             3 => {
-                self.parse_unary(toks)?;
+                let res = self.parse_unary(toks);
+                match res {
+                    Ok(_) => {},
+                    Err(error) => {
+                        self.errors.push(error);
+                    }
+                }
             },
 
             5 => {
-                self.parse_binary(toks)?;
+                let res = self.parse_binary(toks);
+                match res {
+                    Ok(_) => {},
+                    Err(error) => {
+                        self.errors.push(error);
+                    }
+                }
             },
             _ => {
-                return Err(ParserError {
+                self.errors.push(ParserError {
                     message: format!("{:#?}\nInvalid expression length. Expected 2, 3, or 5. Got: {}", toks, toks.len()),
                     position: toks[0].start_position,
-                })
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn parse(&mut self) -> Result<(), ParserError> {
-        let line: Result<Vec<Token>, LexerError> = self.get_line();
-        match line {
-            Ok(line) => {
-                self.parse_line(line)?;
-            },
-            Err(error) => {
-                return Err(ParserError {
-                    position: error.position,
-                    message: format!("\n\t==> Lexical error: {}", error.message),
                 });
             }
         }
@@ -222,19 +231,74 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
-    fn get_line(&mut self) -> Result<Vec<Token>, LexerError> {
+    pub fn parse(&mut self) -> Result<(), ParserError> {
+        let line: Result<Vec<Token>, ParserError> = self.get_line();
+        match line {
+            Ok(line) => {
+                self.parse_line(line)?;
+            },
+            Err(error) => {
+                return Err(error);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn validate_location(&self, token: &Token) -> Result<(), ParserError> {
+        let valid_locations = vec![
+            "@A",
+            "@B",
+            "@C",
+            "@O1",
+            "@O2",
+            "@ACC"
+        ];
+
+        if !valid_locations.contains(&token.value.as_str()) {
+            return Err(ParserError {
+                position: token.start_position,
+                message: format!("Invalid location provided: {}. Expected one of {:#?}", token.value, valid_locations),
+            })
+        }
+
+        Ok(())
+    }
+
+    fn get_line(&mut self) -> Result<Vec<Token>, ParserError> {
         let mut end = false;
         let mut line: Vec<Token> = Vec::new();
         while !end {
-            let token: Token = self.lexer.lex()?;
-            if token.token_type == TokenType::EndOfFile {
-                self.has_next = false;
-                end = true;
-            }
+            let token: Result<Token, LexerError> = self.lexer.lex();
 
-            line.push(token.clone());
-            if token.token_type == TokenType::Newline {
-                end = true;
+            match token {
+                Ok (token) => {
+                    if token.token_type == TokenType::EndOfFile {
+                        self.has_next = false;
+                        end = true;
+                    }
+
+                    if token.token_type == TokenType::Location {
+                        let res = self.validate_location(&token);
+                        match res {
+                            Ok(_) => {},
+                            Err(error) => {
+                                self.errors.push(error);
+                            }
+                        }
+                    }
+
+                    line.push(token.clone());
+                    if token.token_type == TokenType::Newline {
+                        end = true;
+                    }
+                },
+                Err(error) => {
+                    return Err(ParserError {
+                        position: error.position,
+                        message: format!("\n\t==> Lexical error: {}", error.message),
+                    });
+                },
             }
         }
 

@@ -1,4 +1,7 @@
 use std::{env, fs};
+use std::fs::File;
+use std::io::Write;
+use std::time::Instant;
 
 use wh02_lexer::Lexer;
 use wh02_lexer::position::Position;
@@ -11,8 +14,12 @@ pub mod assembler_error;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let path = &args[1];
-    let contents = fs::read_to_string(&path).expect("Failed to load input file.");
+    let input_path = &args[1];
+    let output_path = &args[2];
+
+    let start = Instant::now();
+
+    let contents = fs::read_to_string(&input_path).expect("Failed to load input file.");
     let lexer = Lexer {
         position: Position::default(),
         characters: contents.chars().peekable(),
@@ -30,14 +37,19 @@ fn main() {
 
     let success = assembler.assemble();
 
+    let duration = start.elapsed();
+
     match success {
         Err(error) => {
             println!("ERROR: {}", error);
             return;
         },
         Ok(success) => {
-            println!("{:?}", success);
+            let mut output = File::create(output_path).expect("Failed to create output file.");
+            write!(output, "{}", success).expect("Failed to write to output file.");
+            println!("Wrote {} hex words to {}", assembler.assembled.len(), output_path);
         }
-
     }
+
+    println!("Completed in {}ms ({}ns)", duration.as_millis(), duration.as_nanos());
 }

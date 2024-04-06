@@ -55,7 +55,7 @@
     <a name="appearance" val="logisim_evolution"/>
     <a name="circuit" val="main"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
-    <a name="simulationFrequency" val="32.0"/>
+    <a name="simulationFrequency" val="8.0"/>
     <comp lib="0" loc="(1010,200)" name="Splitter">
       <a name="bit1" val="0"/>
       <a name="bit2" val="0"/>
@@ -78,7 +78,7 @@
     </comp>
     <comp lib="0" loc="(1090,360)" name="Tunnel">
       <a name="facing" val="east"/>
-      <a name="label" val="CLK"/>
+      <a name="label" val="WRITE_ACC"/>
     </comp>
     <comp lib="0" loc="(1090,390)" name="Tunnel">
       <a name="facing" val="east"/>
@@ -444,6 +444,9 @@
     </comp>
     <comp lib="0" loc="(1580,1340)" name="Tunnel">
       <a name="label" val="WRITE_STACK"/>
+    </comp>
+    <comp lib="0" loc="(1580,1370)" name="Tunnel">
+      <a name="label" val="WRITE_ACC"/>
     </comp>
     <comp lib="0" loc="(1580,200)" name="Splitter">
       <a name="bit1" val="0"/>
@@ -961,13 +964,21 @@
 301 321 331 341 398 302 312 332
 342 398 304 314 324 344 398 305
 315 325 335 398 6*379 10000 6*376 303
-313 323 333 343 376 212*0 4*20000 390
-4*20000 391 4*20000 392 4*20000 394 4*20000 395
-309 319 329 339 349 7a9 0 709
-719 729 739 749 7a9 5*20000 7a9 216*0
-20000 4*0 20000 4*0 20000 9*0 6*20000 376
-0 5*20000 376 5*0 376 242*0 79a 6*0
-79a 5*0 79a 242*0 20000 12*0 20000
+313 323 333 343 376 213*0 20000 20000
+20000 390 2b0 20000 20000 20000 391 2b0
+2b0 20000 20000 392 2b0 2b0 20000 20000
+394 2b0 2b0 20000 20000 395 309 319
+329 339 349 7a9 0 709 719 729
+739 749 7a9 0 0 20000 20000 20000
+7a9 212*0 2b0 0 0 0 20000 20000
+0 0 0 20000 20000 20000 0 0
+20000 20000 20000 0 0 0 20000 20000
+0 0 20000 2b0 2b0 20000 20000 20000
+376 0 2b0 2b0 20000 20000 20000 376
+2b0 2b0 0 0 0 376 212*0 20000
+24*0 20000 20000 0 0 0 79a 0
+20000 20000 0 0 0 79a 20000 20000
+0 0 0 79a 242*0 20000 12*0 20000
 </a>
       <a name="dataWidth" val="32"/>
     </comp>
@@ -1294,6 +1305,7 @@
     <wire from="(1420,1120)" to="(1510,1120)"/>
     <wire from="(1420,1130)" to="(1500,1130)"/>
     <wire from="(1420,1140)" to="(1490,1140)"/>
+    <wire from="(1420,1150)" to="(1480,1150)"/>
     <wire from="(1420,160)" to="(1420,170)"/>
     <wire from="(1420,170)" to="(1430,170)"/>
     <wire from="(1430,170)" to="(1430,180)"/>
@@ -1309,6 +1321,8 @@
     <wire from="(1460,720)" to="(1490,720)"/>
     <wire from="(1470,810)" to="(1470,840)"/>
     <wire from="(1470,810)" to="(1580,810)"/>
+    <wire from="(1480,1150)" to="(1480,1370)"/>
+    <wire from="(1480,1370)" to="(1580,1370)"/>
     <wire from="(1480,840)" to="(1480,850)"/>
     <wire from="(1480,840)" to="(1580,840)"/>
     <wire from="(1490,1140)" to="(1490,1340)"/>
@@ -1672,6 +1686,10 @@
       <circ-port dir="out" pin="260,110" x="130" y="60"/>
       <circ-port dir="out" pin="260,80" x="130" y="80"/>
     </appear>
+    <comp lib="0" loc="(120,1010)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="WE"/>
+    </comp>
     <comp lib="0" loc="(120,110)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="O3"/>
@@ -2015,8 +2033,10 @@
     <comp lib="5" loc="(140,810)" name="DipSwitch">
       <a name="facing" val="east"/>
     </comp>
+    <comp loc="(180,980)" name="EightBitBufferedInput"/>
     <comp loc="(210,450)" name="MultiplexedSwitch"/>
     <comp loc="(360,210)" name="MultiplexedSwitch"/>
+    <wire from="(120,1010)" to="(130,1010)"/>
     <wire from="(120,110)" to="(160,110)"/>
     <wire from="(120,1210)" to="(140,1210)"/>
     <wire from="(120,140)" to="(150,140)"/>
@@ -2037,7 +2057,8 @@
     <wire from="(120,740)" to="(150,740)"/>
     <wire from="(120,780)" to="(150,780)"/>
     <wire from="(120,80)" to="(170,80)"/>
-    <wire from="(120,980)" to="(190,980)"/>
+    <wire from="(120,980)" to="(130,980)"/>
+    <wire from="(130,1000)" to="(130,1010)"/>
     <wire from="(140,1150)" to="(150,1150)"/>
     <wire from="(140,1210)" to="(140,1230)"/>
     <wire from="(140,1210)" to="(220,1210)"/>
@@ -2063,6 +2084,7 @@
     <wire from="(180,50)" to="(180,120)"/>
     <wire from="(180,810)" to="(180,960)"/>
     <wire from="(180,960)" to="(190,960)"/>
+    <wire from="(180,980)" to="(190,980)"/>
     <wire from="(200,110)" to="(220,110)"/>
     <wire from="(200,360)" to="(210,360)"/>
     <wire from="(200,610)" to="(210,610)"/>

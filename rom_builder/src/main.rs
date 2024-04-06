@@ -58,6 +58,7 @@ impl RomBuilder {
         let reset_step_counter = 0x20000;
         let enable_program_counter = 0x400;
         let halt = 0x10000;
+        let nop = 0x00000;
 
         // Opcode definitions
         let mov_a_b = 0x1;
@@ -117,7 +118,9 @@ impl RomBuilder {
         }
 
         self.define(2, mov_a_b, self.read_write("A", "B"));
-        self.define(3, mov_a_b, reset_step_counter);
+        self.define(3, mov_a_b, nop);
+        self.define(4, mov_a_b, self.read_write("NULL", "ACC"));
+        self.define(5, mov_a_b, reset_step_counter);
 
         self.define(2, mov_a_c, self.read_write("A", "C"));
         self.define(3, mov_a_c, reset_step_counter);
@@ -133,7 +136,8 @@ impl RomBuilder {
         self.define(4, mov_a_ram, reset_step_counter);
 
         self.define(2, mov_b_a, self.read_write("B", "A"));
-        self.define(3, mov_b_a, reset_step_counter);
+        self.define(3, mov_b_a, self.read_write("NULL", "ACC"));
+        self.define(4, mov_b_a, reset_step_counter);
 
         self.define(2, mov_b_c, self.read_write("B", "C"));
         self.define(3, mov_b_c, reset_step_counter);
@@ -149,10 +153,12 @@ impl RomBuilder {
         self.define(4, mov_b_ram, reset_step_counter);
 
         self.define(2, mov_c_a, self.read_write("C", "A"));
-        self.define(3, mov_c_a, reset_step_counter);
+        self.define(3, mov_c_a, self.read_write("NULL", "ACC"));
+        self.define(4, mov_c_a, reset_step_counter);
 
         self.define(2, mov_c_b, self.read_write("C", "B"));
-        self.define(3, mov_c_b, reset_step_counter);
+        self.define(3, mov_c_b, self.read_write("NULL", "ACC"));
+        self.define(4, mov_c_b, reset_step_counter);
 
         self.define(2, mov_c_o1, self.read_write("C", "O1"));
         self.define(3, mov_c_o1, reset_step_counter);
@@ -165,10 +171,12 @@ impl RomBuilder {
         self.define(4, mov_c_ram, reset_step_counter);
 
         self.define(2, mov_o1_a, self.read_write("O1", "A"));
-        self.define(3, mov_o1_a, reset_step_counter);
+        self.define(3, mov_o1_a, self.read_write("NULL", "ACC"));
+        self.define(4, mov_o1_a, reset_step_counter);
 
         self.define(2, mov_o1_b, self.read_write("O1", "B"));
-        self.define(3, mov_o1_b, reset_step_counter);
+        self.define(3, mov_o1_b, self.read_write("NULL", "ACC"));
+        self.define(4, mov_o1_b, reset_step_counter);
 
         self.define(2, mov_o1_c, self.read_write("O1", "C"));
         self.define(3, mov_o1_c, reset_step_counter);
@@ -180,10 +188,12 @@ impl RomBuilder {
         self.define(3, mov_o1_ram, self.read_write("O1", "RAM"));
 
         self.define(2, mov_o2_a, self.read_write("O2", "A"));
-        self.define(3, mov_o2_a, reset_step_counter);
+        self.define(3, mov_o2_a, self.read_write("NULL", "ACC"));
+        self.define(4, mov_o2_a, reset_step_counter);
 
         self.define(2, mov_o2_b, self.read_write("O2", "B"));
-        self.define(3, mov_o2_b, reset_step_counter);
+        self.define(3, mov_o2_b, self.read_write("NULL", "ACC"));
+        self.define(4, mov_o2_b, reset_step_counter);
 
         self.define(2, mov_o2_c, self.read_write("O2", "C"));
         self.define(3, mov_o2_c, reset_step_counter);
@@ -197,11 +207,13 @@ impl RomBuilder {
 
         self.define(2, mov_ram_a, self.read_write("RAM", "MAR"));
         self.define(3, mov_ram_a, self.read_write("RAM", "A"));
-        self.define(4, mov_ram_a, reset_step_counter);
+        self.define(4, mov_ram_a, self.read_write("NULL", "ACC"));
+        self.define(5, mov_ram_a, reset_step_counter);
 
         self.define(2, mov_ram_b, self.read_write("RAM", "MAR"));
         self.define(3, mov_ram_b, self.read_write("RAM", "B"));
-        self.define(4, mov_ram_b, reset_step_counter);
+        self.define(4, mov_ram_b, self.read_write("NULL", "ACC"));
+        self.define(5, mov_ram_b, reset_step_counter);
 
         self.define(2, mov_ram_c, self.read_write("RAM", "MAR"));
         self.define(3, mov_ram_c, self.read_write("RAM", "C"));
@@ -225,11 +237,13 @@ impl RomBuilder {
 
         self.define(2, mov_bus_a, self.read_write("PRGC", "MAR"));
         self.define(3, mov_bus_a, self.read_write("RAM", "A") | enable_program_counter);
-        self.define(4, mov_bus_a, reset_step_counter);
+        self.define(4, mov_bus_a, self.read_write("NULL", "ACC"));
+        self.define(5, mov_bus_a, reset_step_counter);
 
         self.define(2, mov_bus_b, self.read_write("PRGC", "MAR"));
         self.define(3, mov_bus_b, self.read_write("RAM", "B") | enable_program_counter);
-        self.define(4, mov_bus_b, reset_step_counter);
+        self.define(4, mov_bus_b, self.read_write("NULL", "ACC"));
+        self.define(5, mov_bus_b, reset_step_counter);
 
         self.define(2, mov_bus_c, self.read_write("PRGC", "MAR"));
         self.define(3, mov_bus_c, self.read_write("RAM", "C") | enable_program_counter);
@@ -249,10 +263,14 @@ impl RomBuilder {
         self.define(5, mov_bus_ram, self.read_write("STK", "RAM") | enable_program_counter);
 
         self.define(2, mov_acc_a, self.read_write("ACC", "A"));
-        self.define(3, mov_acc_a, reset_step_counter);
+        self.define(3, mov_acc_a, nop);
+        self.define(4, mov_acc_a, self.read_write("NULL", "ACC"));
+        self.define(5, mov_acc_a, reset_step_counter);
 
         self.define(2, mov_acc_b, self.read_write("ACC", "B"));
-        self.define(3, mov_acc_b, reset_step_counter);
+        self.define(3, mov_acc_b, nop);
+        self.define(4, mov_acc_b, self.read_write("NULL", "ACC"));
+        self.define(5, mov_acc_b, reset_step_counter);
 
         self.define(2, mov_acc_c, self.read_write("ACC", "C"));
         self.define(3, mov_acc_c, reset_step_counter);
@@ -289,6 +307,7 @@ impl RomBuilder {
         // for that decoder. This maps the register name to the bits
         // needed to output/input that register
         let output_selection: HashMap<&str, u32> = HashMap::from([
+            ("NULL", 0x000),
             ("A", 0x100),
             ("B", 0x101),
             ("C", 0x102),
@@ -303,6 +322,7 @@ impl RomBuilder {
         ]);
 
         let input_selection: HashMap<&str, u32> = HashMap::from([
+            ("NULL", 0x000),
             ("A", 0x200),
             ("B", 0x210),
             ("C", 0x220),
@@ -314,6 +334,7 @@ impl RomBuilder {
             ("INST", 0x280),
             ("RAM", 0x290),
             ("STK", 0x2A0),
+            ("ACC", 0x2B0),
         ]);
 
         return output_selection[read] | input_selection[write];

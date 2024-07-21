@@ -105,6 +105,7 @@ impl RomBuilder {
         let mov_acc_o1 = 0x2A;
         let mov_acc_o2 = 0x2B;
         let mov_acc_ram = 0x2C;
+        let jmp = 0x2D;
 
         // Defining microcode
         //
@@ -286,6 +287,11 @@ impl RomBuilder {
         self.define(4, mov_acc_ram, self.read_write("PRGC", "MAR"));
         self.define(5, mov_acc_ram, self.read_write("STK", "RAM") | enable_program_counter);
         self.define(6, mov_acc_ram, reset_step_counter);
+
+        self.define(2, jmp, self.read_write("PRGC", "MAR"));
+        self.define(3, jmp, self.read_write("RAM", "STK"));
+        self.define(4, jmp, self.read_write("STK", "PRGC"));
+        self.define(5, jmp, reset_step_counter);
     }
 
     fn define(&mut self, step: u16, opcode: u16, val: u32) {

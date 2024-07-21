@@ -264,7 +264,10 @@ impl Assembler {
                         Ok("".to_string())
                     },
                     Keyword::JMP => {
-                        Ok("".to_string())
+                        let mut result = "2D ".to_string();
+                        result += operand.value.as_str();
+
+                        Ok(result)
                     }
                     _ => {
                         Err(

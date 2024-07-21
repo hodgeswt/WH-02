@@ -13,8 +13,10 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
-.vscode/*
+**/.vscode
 
 # any .bin file that isn't rom.bin
 *.bin
 !rom.bin
+
+.DS_STORE

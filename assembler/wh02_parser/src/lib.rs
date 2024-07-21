@@ -280,7 +280,9 @@ impl<'a> Parser<'a> {
         let line: Result<Vec<Token>, ParserError> = self.get_line();
         match line {
             Ok(line) => {
-                self.parse_line(line)?;
+                if line[0].token_type != TokenType::Comment {
+                    self.parse_line(line)?;
+                }
             },
             Err(error) => {
                 return Err(error);
